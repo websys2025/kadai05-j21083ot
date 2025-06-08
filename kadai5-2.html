@@ -4,9 +4,9 @@
     <title>演習課題5-2：外部APIの呼び出しテスト</title>
 </head>
 <body>
-    <h1 id="msg">何かのAPI</h1>
+    <h1 id="msg">天気情報API</h1>
     <form name="apiform"><p>
-        何かのフォーム：<input type="text" name="form_data">
+        都市名：<input type="text" name="form_data">
         <button type="button" id="btn1" onclick="some_api(this.form)">実行</button>
     </p></form>
     
@@ -14,7 +14,22 @@
     <script>
         async function some_api(myForm) {
             // ここにコードを書く
-            document.getElementById("result").innerHTML += myForm.form_data.value+"<br />";
+            const city = myForm.form_data.value;
+            const apiKey = "YOUR_API_KEY"; // ← OpenWeatherMapのAPIキーに置き換えてください
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric&lang=ja`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.weather) {
+                    const weather = data.weather[0].description;
+                    const temp = data.main.temp;
+                    document.getElementById("result").innerHTML += `【${city}】${weather} / ${temp}℃<br />`;
+                } else {
+                    document.getElementById("result").innerHTML += `都市「${city}」が見つかりませんでした。<br />`;
+                }
+            } catch (error) {
+                document.getElementById("result").innerHTML += `エラーが発生しました。<br />`;
+            }
             document.apiform.reset();
         }
     </script>
